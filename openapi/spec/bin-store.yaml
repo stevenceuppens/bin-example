@@ -1,0 +1,32 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "PhotoStore"
+host: "photostore"
+basePath: "/api/v1"
+tags:
+- name: "group"
+schemes:
+- "http"
+paths:
+  /groups:
+    put:
+      tags:
+      - "group"
+      summary: "Add new photo to the group"
+      description: ""
+      operationId: "groupAddPhoto"
+      consumes:
+      - "application/octet-stream"
+      parameters:
+      - in: "body"
+        name: "photo"
+        required: true
+        schema:
+          type: "string"
+          format: "binary"
+      responses:
+        200:
+          description: "Photo added succesfully"
+        500:
+          description: "Internal server error"
