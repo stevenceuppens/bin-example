@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"github.com/stevenceuppens/bin-example/openapi/gen/bin-api/server"
@@ -48,6 +51,32 @@ func main() {
 		fmt.Println("Sync OK")
 
 		return group.NewGroupAddPhotoOK()
+	})
+
+	openapi.GroupGroupGetPhotoHandler = group.GroupGetPhotoHandlerFunc(func(params group.GroupGetPhotoParams) middleware.Responder {
+		fmt.Println("Sync Start")
+
+		api := c_client.NewHTTPClientWithConfig(nil, c_client.DefaultTransportConfig().WithHost("127.0.0.1:3001"))
+
+		// create buffer to temporarly store the data
+		var buffer bytes.Buffer
+		writer := bufio.NewWriter(&buffer)
+
+		// call upstream
+		_, err := api.Group.GroupGetPhoto(c_group.NewGroupGetPhotoParams(), writer)
+		if err != nil {
+			fmt.Println(err)
+			return group.NewGroupGetPhotoInternalServerError()
+		}
+
+		fmt.Println("Sync OK")
+
+		// convert buffer into reader
+		reader := bufio.NewReader(&buffer)
+		// create closer
+		closer := ioutil.NopCloser(reader)
+
+		return group.NewGroupGetPhotoOK().WithPayload(closer)
 	})
 
 	fmt.Println("Start Api @ ", servicePort)

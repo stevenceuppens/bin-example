@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -14,6 +15,8 @@ import (
 )
 
 var servicePort = 3001
+
+var tmp []byte
 
 func main() {
 	// load embedded swagger file
@@ -39,7 +42,16 @@ func main() {
 		}
 
 		fmt.Println("got data: ", buf)
+
+		tmp = buf
+
 		return group.NewGroupAddPhotoOK()
+	})
+
+	openapi.GroupGroupGetPhotoHandler = group.GroupGetPhotoHandlerFunc(func(params group.GroupGetPhotoParams) middleware.Responder {
+
+		reader := bytes.NewReader(tmp)
+		return group.NewGroupGetPhotoOK().WithPayload(ioutil.NopCloser(reader))
 	})
 
 	fmt.Println("Start Store @ ", servicePort)

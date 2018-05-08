@@ -18,6 +18,8 @@ paths:
       operationId: "groupAddPhoto"
       consumes:
       - "application/octet-stream"
+      produces:
+      - "text/plain"
       parameters:
       - in: "body"
         name: "photo"
@@ -28,5 +30,23 @@ paths:
       responses:
         200:
           description: "Photo added succesfully"
+        500:
+          description: "Internal server error"
+    get:
+      tags:
+      - "group"
+      summary: "Get last photo from the group"
+      description: ""
+      operationId: "groupGetPhoto"
+      consumes:
+      - "text/plain"
+      produces:
+      - "application/octet-stream"
+      responses:
+        200:
+          description: "Photo added succesfully"
+          schema:
+            type: "string"
+            format: "binary"
         500:
           description: "Internal server error"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,11 +13,14 @@ import (
 
 func main() {
 	argsWithoutProg := os.Args[1:]
-	if len(argsWithoutProg) != 1 {
-		fmt.Println("Need one argument: path to a binary file to upload")
+	if len(argsWithoutProg) == 1 {
+		uploadFile(argsWithoutProg)
 		return
 	}
+	downloadFile()
+}
 
+func uploadFile(argsWithoutProg []string) {
 	file, err := os.Open(argsWithoutProg[0])
 
 	if err != nil {
@@ -40,4 +44,19 @@ func main() {
 	}
 
 	fmt.Println(res)
+}
+
+func downloadFile() {
+	var buffer bytes.Buffer
+	writer := bufio.NewWriter(&buffer)
+
+	params := group.NewGroupGetPhotoParams()
+	api := client.NewHTTPClientWithConfig(nil, client.DefaultTransportConfig().WithHost("127.0.0.1:3000"))
+	_, err := api.Group.GroupGetPhoto(params, writer)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(buffer)
 }
